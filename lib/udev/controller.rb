@@ -28,6 +28,7 @@ module Udev
     end
 
     def devname; @env[ENV_DEVNAME]; end
+    def ttyname; File.basename(devname); end
 
     def devpath(n = nil)
       if n.nil?

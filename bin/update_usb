@@ -27,6 +27,11 @@ uc.on_subsystem 'tty' do
     # only probe if it's /dev/ttyUSB2
     if uc.env['ID_IFACE'] == '02'
       l.info { "Ok, got the SMS tty at #{uc.devname}" }
+      dev_symlink_path = File.join(ROOT_PATH, 'dev', uc.ttyname)
+
+      File.delete(dev_symlink_path) if File.exists?(dev_symlink_path)
+      File.symlink(uc.devname, dev_symlink_path)
+
       fork_proc = lambda do
         Gammut.probe_ttyUSB(uc.devname)
       end
@@ -38,6 +43,9 @@ uc.on_subsystem 'tty' do
 
     if uc.env['ID_IFACE'] == '02'
       l.info { "Ok, un-registering SMS tty at #{uc.devname}" }
+      dev_symlink_path = File.join(ROOT_PATH, 'dev', uc.ttyname)
+      File.delete(dev_symlink_path) rescue nil
+
       fork_proc = lambda do
         Gammut.unregister_ttyUSB(uc.devname)
       end
@@ -52,6 +60,7 @@ unless fork_proc.nil?
   pid = Kernel.fork
   if pid.nil?
     fork_proc.call
+    Kernel.exit(0)
   else
     Process.detach(pid)
   end
