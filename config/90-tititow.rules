@@ -1,0 +1,2 @@
+# Bus 001 Device 012: ID 12d1:1001 Huawei Technologies Co., Ltd. E620 USB Modem
+ATTRS{idVendor}=="12d1", ATTRS{idProduct}=="1001", RUN+="/opt/caresharing/tititow/script/update_usb"

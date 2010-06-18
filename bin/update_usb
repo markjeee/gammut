@@ -1,0 +1,121 @@
+#!/usr/bin/ruby
+
+require 'logger'
+ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+require File.join(ROOT_PATH, 'lib/udev/controller')
+
+# just bail out if we smell something fishy!
+exit(0) if ENV['ACTION'].nil? || ENV['ACTION'].empty?
+
+l = Logger.new(File.join(ROOT_PATH, 'log/update_usb.log'))
+l.level = Logger::INFO
+
+l.debug { "#{ENV['SUBSYSTEM']} #{ENV['ACTION']} #{ENV['DEVPATH']}" }
+
+# LOG ADD the environment keys
+# ENV.keys.each do |k|
+#   f.write("#{k} = #{ENV[k]}\n")
+# end
+
+uc = Udev::Controller.new(ENV)
+uc.on_subsystem 'tty' do
+  uc.on_action 'add' do
+    l.info { "Added #{uc.devname} #{uc.devpath(5)} #{uc.parentpath(4)}" }
+
+    if uc.env['ID_IFACE'] == '02'
+      l.info { "Ok, got the SMS tty at #{uc.devname}" }
+    end
+  end
+
+  uc.on_action 'remove' do
+    l.info { "Removed #{uc.devname} #{uc.devpath(5)} #{uc.parentpath(4)}" }
+  end
+end
+
+l.close
+
+# Awesome: Thu Jun 17 18:16:37 +0800 2010
+# UDEV_LOG = 3
+# ACTION = add
+# DEVPATH = /devices/pci0000:00/0000:00:1a.7/usb1/1-5/1-5.1/1-5.1.1/1-5.1.1:1.2/ttyUSB2/tty/ttyUSB2
+# SUBSYSTEM = tty
+# DEVNAME = /dev/ttyUSB2
+# SEQNUM = 2459
+# MAJOR = 188
+# MINOR = 2
+# DEVLINKS = /dev/char/188:2 /dev/serial/by-path/pci-0000:00:1a.7-usb-0:5.1.1:1.2-port0 /dev/serial/by-id/usb-HUAWEI_Technology_HUAWEI_Mobile-if02-por
+# t0
+# ID_PORT = 0
+# ID_PATH = pci-0000:00:1a.7-usb-0:5.1.1:1.2
+# ID_VENDOR = HUAWEI_Technology
+# ID_VENDOR_ENC = HUAWEI\x20Technology
+# ID_VENDOR_ID = 12d1
+# ID_MODEL = HUAWEI_Mobile
+# ID_MODEL_ENC = HUAWEI\x20Mobile
+# ID_MODEL_ID = 1001
+# ID_REVISION = 0000
+# ID_SERIAL = HUAWEI_Technology_HUAWEI_Mobile
+# ID_TYPE = generic
+# ID_BUS = usb
+# ID_USB_INTERFACES = :ffffff:080650:
+# ID_USB_INTERFACE_NUM = 02
+# ID_USB_DRIVER = option
+# ID_IFACE = 02
+# ID_VENDOR_FROM_DATABASE = Huawei Technologies Co., Ltd.
+# ID_MODEL_FROM_DATABASE = E620 USB Modem
+# Awesome: Thu Jun 17 18:16:37 +0800 2010
+# UDEV_LOG = 3
+# ACTION = add
+# DEVPATH = /devices/pci0000:00/0000:00:1a.7/usb1/1-5/1-5.1/1-5.1.1/1-5.1.1:1.1/ttyUSB1/tty/ttyUSB1
+# SUBSYSTEM = tty
+# DEVNAME = /dev/ttyUSB1
+# SEQNUM = 2456
+# MAJOR = 188
+# MINOR = 1
+# DEVLINKS = /dev/char/188:1 /dev/serial/by-path/pci-0000:00:1a.7-usb-0:5.1.1:1.1-port0 /dev/serial/by-id/usb-HUAWEI_Technology_HUAWEI_Mobile-if01-port0
+# ID_PORT = 0
+# ID_PATH = pci-0000:00:1a.7-usb-0:5.1.1:1.1
+# ID_VENDOR = HUAWEI_Technology
+# ID_VENDOR_ENC = HUAWEI\x20Technology
+# ID_VENDOR_ID = 12d1
+# ID_MODEL = HUAWEI_Mobile
+# ID_MODEL_ENC = HUAWEI\x20Mobile
+# ID_MODEL_ID = 1001
+# ID_REVISION = 0000
+# ID_SERIAL = HUAWEI_Technology_HUAWEI_Mobile
+# ID_TYPE = generic
+# ID_BUS = usb
+# ID_USB_INTERFACES = :ffffff:080650:
+# ID_USB_INTERFACE_NUM = 01
+# ID_USB_DRIVER = option
+# ID_IFACE = 01
+# ID_VENDOR_FROM_DATABASE = Huawei Technologies Co., Ltd.
+# ID_MODEL_FROM_DATABASE = E620 USB Modem
+# Awesome: Thu Jun 17 18:16:37 +0800 2010
+# UDEV_LOG = 3
+# ACTION = add
+# DEVPATH = /devices/pci0000:00/0000:00:1a.7/usb1/1-5/1-5.1/1-5.1.1/1-5.1.1:1.0/ttyUSB0/tty/ttyUSB0
+# SUBSYSTEM = tty
+# DEVNAME = /dev/ttyUSB0
+# SEQNUM = 2453
+# MAJOR = 188
+# MINOR = 0
+# DEVLINKS = /dev/char/188:0 /dev/serial/by-path/pci-0000:00:1a.7-usb-0:5.1.1:1.0-port0 /dev/serial/by-id/usb-HUAWEI_Technology_HUAWEI_Mobile-if00-port0
+# ID_PORT = 0
+# ID_PATH = pci-0000:00:1a.7-usb-0:5.1.1:1.0
+# ID_VENDOR = HUAWEI_Technology
+# ID_VENDOR_ENC = HUAWEI\x20Technology
+# ID_VENDOR_ID = 12d1
+# ID_MODEL = HUAWEI_Mobile
+# ID_MODEL_ENC = HUAWEI\x20Mobile
+# ID_MODEL_ID = 1001
+# ID_REVISION = 0000
+# ID_SERIAL = HUAWEI_Technology_HUAWEI_Mobile
+# ID_TYPE = generic
+# ID_BUS = usb
+# ID_USB_INTERFACES = :ffffff:080650:
+# ID_USB_INTERFACE_NUM = 00
+# ID_USB_DRIVER = option
+# ID_IFACE = 00
+# ID_VENDOR_FROM_DATABASE = Huawei Technologies Co., Ltd.
+# ID_MODEL_FROM_DATABASE = E620 USB Modem
