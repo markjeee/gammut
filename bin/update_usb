@@ -2,37 +2,60 @@
 
 require 'logger'
 ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-require File.join(ROOT_PATH, 'lib/udev/controller')
+require File.join(ROOT_PATH, 'config/env_defaults')
+
+# Load environment constants
+if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
+  require File.join(ROOT_PATH, 'config/env')
+end
+
+require File.join(ROOT_PATH, 'lib/udev')
+require File.join(ROOT_PATH, 'lib/gammut')
 
 # just bail out if we smell something fishy!
 exit(0) if ENV['ACTION'].nil? || ENV['ACTION'].empty?
 
-l = Logger.new(File.join(ROOT_PATH, 'log/update_usb.log'))
-l.level = Logger::INFO
-
+l = Gammut.update_usb_logger
 l.debug { "#{ENV['SUBSYSTEM']} #{ENV['ACTION']} #{ENV['DEVPATH']}" }
 
-# LOG ADD the environment keys
-# ENV.keys.each do |k|
-#   f.write("#{k} = #{ENV[k]}\n")
-# end
-
+fork_proc = nil
 uc = Udev::Controller.new(ENV)
 uc.on_subsystem 'tty' do
   uc.on_action 'add' do
     l.info { "Added #{uc.devname} #{uc.devpath(5)} #{uc.parentpath(4)}" }
 
+    # only probe if it's /dev/ttyUSB2
     if uc.env['ID_IFACE'] == '02'
       l.info { "Ok, got the SMS tty at #{uc.devname}" }
+      fork_proc = lambda do
+        Gammut.probe_ttyUSB(uc.devname)
+      end
     end
   end
 
   uc.on_action 'remove' do
     l.info { "Removed #{uc.devname} #{uc.devpath(5)} #{uc.parentpath(4)}" }
+
+    if uc.env['ID_IFACE'] == '02'
+      l.info { "Ok, un-registering SMS tty at #{uc.devname}" }
+      fork_proc = lambda do
+        Gammut.unregister_ttyUSB(uc.devname)
+      end
+    end
   end
 end
 
+# let's close our log file, ahead of forking, if any
 l.close
+
+unless fork_proc.nil?
+  pid = Kernel.fork
+  if pid.nil?
+    fork_proc.call
+  else
+    Process.detach(pid)
+  end
+end
 
 # Awesome: Thu Jun 17 18:16:37 +0800 2010
 # UDEV_LOG = 3
