@@ -1,0 +1,25 @@
+Alrayt, here's what else we can do here:
+
+* Refactor update_usb to work with other USB modems, right now it's all tied up to the Huawei E1552 (a.k.a. Globe Tattoo)
+* Add gammu-smsd control script (e.g. bin/gammu-smsd-ctl globe status). This will use a config/gammut.yml config file, that looks like this:
+
+# global database config
+database:
+  adapter: mysql
+  username: xxxx
+  password: xxxx
+
+globe:
+  IMSI: 1234567890 (if tied to a specific SIM)
+  IMEI: 1234567890 (if tied to a specific IMEI)
+
+  # local database config
+  database:
+    adapter: mysql
+    username: xxxx
+    password: xxxx
+
+* Add support for auto-starting gammu-smsd and killing it when a USB device is removed.
+* Add bin/scan_usb, for making manual scans of existing USB devices
+* Add Rakefile and necessary init and configure tasks
+

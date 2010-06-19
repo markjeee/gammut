@@ -1,0 +1,1 @@
+This is a small framework to easily detect, configure and control gammu-smsd services. The idea is to just plugin a USB modem, the script detects it, retrieves some basic information and maps it to a configured gammu-smsd instance.
