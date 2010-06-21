@@ -22,4 +22,3 @@ globe:
 * Add support for auto-starting gammu-smsd and killing it when a USB device is removed.
 * Add bin/scan_usb, for making manual scans of existing USB devices
 * Add Rakefile and necessary init and configure tasks
-

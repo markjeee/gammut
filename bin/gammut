@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+require File.join(ROOT_PATH, 'config/env_defaults')
+
+# Load environment constants
+if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
+  require File.join(ROOT_PATH, 'config/env')
+end
+
+require File.join(ROOT_PATH, 'lib/gammut')
+
+require 'optparse'
+require 'ostruct'
+
+opts = OpenStruct.new
+opts_parse = OptionParser.new do |o|
+  o.banner = "Gammut command utility\n" +
+    "  Usage: #{$0} command [options]\n" +
+    "  Commands: list status start stop"
+
+  o.separator ""
+end
+opts_parse.parse!(ARGV)
+
+command = ARGV[0]
+case command
+when nil, ''
+  puts opts_parse.help
+when 'list'
+
+end
