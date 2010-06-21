@@ -1,5 +1,6 @@
 require 'timeout'
 require 'yaml'
+require 'logger'
 
 module Gammut
   CUSTOM_CONFIG_FILE = <<CCF
@@ -107,7 +108,7 @@ CCF
 
   def self.gammu_identify(devname, l)
     basen = File.basename(devname)
-    tmp_config_path = File.join(ROOT_PATH, "tmp", "#{basen}.config")
+    tmp_config_path = File.join(ROOT_PATH, "var", "#{basen}.config")
 
     ccf = "#{CUSTOM_CONFIG_FILE}"
     ccf.gsub!("%devname%", devname)
