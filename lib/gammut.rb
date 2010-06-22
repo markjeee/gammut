@@ -10,6 +10,8 @@ port=%devname%
 connection=at
 CCF
 
+  autoload :Runner, File.join(File.dirname(__FILE__), 'gammut/runner')
+
   def self.capture_and_log_errors(l, reraise = false, &block)
     begin
       yield

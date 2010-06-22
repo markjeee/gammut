@@ -28,5 +28,5 @@ case command
 when nil, ''
   puts opts_parse.help
 when 'list'
-
+  Gammut::Runner.list_devices(ARGV, opts)
 end
