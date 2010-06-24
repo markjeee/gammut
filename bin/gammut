@@ -9,6 +9,7 @@ if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
 end
 
 require File.join(ROOT_PATH, 'lib/gammut')
+Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
 
 require 'optparse'
 require 'ostruct'
@@ -28,5 +29,7 @@ case command
 when nil, ''
   puts opts_parse.help
 when 'list'
-
+  Gammut::Runner.list(ARGV, opts)
+when 'list_devices'
+  Gammut::Runner.list_devices(ARGV, opts)
 end

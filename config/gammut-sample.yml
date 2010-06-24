@@ -1,0 +1,21 @@
+database:
+  adapter: mysql
+  username: root
+  password:
+  database: smsd
+  host: 127.0.0.1
+  port: 3306
+
+services:
+  globe1:
+    network: globe
+    IMSI: "515021508993847"
+
+    # optional
+    number:
+  globe2:
+    network: globe
+    IMSI: "515021508997248"
+
+    # optional
+    number:
