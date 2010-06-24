@@ -7,6 +7,22 @@ module Gammut
       @sdata = sdata
     end
 
+    # write configuration file. overwriting any
+    def configure
+    end
+
+    # start the service, if not started
+    def start
+    end
+
+    # stop the service if not available
+    def stop
+    end
+
+    # check if the service is running
+    def status
+    end
+
     def device
       if defined?(@device)
         @device
