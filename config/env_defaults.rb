@@ -9,9 +9,6 @@ GAMMU_CONFIG_PATH = 'var'
 
 GAMMU_SMSD_BIN = '/usr/bin/gammu-smsd'
 
-UPDATE_USB_LOG = 'log/update_usb.log'
-UPDATE_USB_LOG_LEVEL = Logger::INFO
-
 GAMMUT_CONFIG_PATH = 'config/gammut.yml'
 GAMMUT_LOG = 'log/gammut.log'
 GAMMUT_LOG_LEVEL = Logger::INFO

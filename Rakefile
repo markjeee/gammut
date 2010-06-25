@@ -11,7 +11,7 @@ task :initialize_working_directory do
   FileUtils.mkpath(File.join(root_path, 'tmp'))
 
   FileUtils.touch(File.join(root_path, 'log/gammu.log'))
-  FileUtils.touch(File.join(root_path, 'log/update_usb.log'))
+  FileUtils.touch(File.join(root_path, 'log/gammut.log'))
 end
 
 task :initialize_udev_rules do

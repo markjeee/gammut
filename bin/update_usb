@@ -11,11 +11,10 @@ end
 
 require File.join(ROOT_PATH, 'lib/udev')
 require File.join(ROOT_PATH, 'lib/gammut')
-Gammut.init(ROOT_PATH, l = Gammut.update_usb_logger(ROOT_PATH))
+Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
 
 # just bail out if we smell something fishy!
 exit(0) if ENV['ACTION'].nil? || ENV['ACTION'].empty?
-
 l.debug { "#{ENV['SUBSYSTEM']} #{ENV['ACTION']} #{ENV['DEVPATH']}" }
 
 fork_proc = nil
@@ -33,7 +32,7 @@ uc.on_subsystem 'tty' do
       File.symlink(uc.devname, dev_symlink_path)
 
       fork_proc = lambda do
-        Gammut.logger = l = Gammut.update_usb_logger(ROOT_PATH)
+        Gammut.logger = l = Gammut.gammut_logger(ROOT_PATH)
         Gammut.probe_ttyUSB(uc.devname)
         l.close
       end
@@ -49,7 +48,7 @@ uc.on_subsystem 'tty' do
       File.delete(dev_symlink_path) rescue nil
 
       fork_proc = lambda do
-        Gammut.logger = l = Gammut.update_usb_logger(ROOT_PATH)
+        Gammut.logger = l = Gammut.gammut_logger(ROOT_PATH)
         Gammut.unregister_ttyUSB(uc.devname)
         l.close
       end

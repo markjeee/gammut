@@ -1,11 +1,46 @@
 module Gammut
   module Registry
-    def self.find_devices(config, registry_path)
+    def self.find_devices(config)
       devices = [ ]
-      Dir[File.join(registry_path, 'ttyUSB*.yml')].sort.each do |yml_file|
-        devices.push(Gammut::Device.new(YAML.load_file(yml_file)))
+      Dir[File.join(Gammut.registry_path, 'ttyUSB*.yml')].sort.each do |yml_file|
+        yml_content = YAML.load_file(yml_file)
+        unless yml_content.nil? || yml_content == false
+          devices.push(Gammut::Device.new(yml_content))
+        end
       end
       devices
+    end
+
+    def self.find_service_by_devname(devname, config)
+      basen = File.basename(devname)
+      yml_file_path = File.join(Gammut.registry_path, "#{basen}.yml")
+      if File.exists?(yml_file_path)
+        device = Gammut::Device.new(YAML.load_file(yml_file_path))
+        svc = nil
+        service_name = nil
+
+        config['services'].each do |sk, sd|
+          if sd.include?('IMSI')
+            if device.imsi == sd['IMSI'].to_s
+              service_name = sk
+              break
+            end
+          elsif sd.include?('IMEI')
+            if device.imei == sd['IMEI'].to_s
+              service_name = sk
+              break
+            end
+          end
+        end
+
+        unless service_name.nil?
+          svc = Gammut::Service.new(service_name, config['services'][service_name])
+        end
+
+        svc
+      else
+        nil
+      end
     end
 
     def self.find_service(service_name, config)

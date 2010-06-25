@@ -11,6 +11,10 @@ module Gammut
       !device.nil?
     end
 
+    def auto_start?
+      true
+    end
+
     # write configuration file. overwriting any
     def configure
       devname = device.devname
@@ -34,6 +38,10 @@ module Gammut
     def status
       Gammut::Gammu.gammu_smsd_status(device.devname, @skey)
     end
+
+    def devname; device.devname; end
+    def imei; device.imei; end
+    def imsi; device.imsi; end
 
     def device
       if defined?(@device)

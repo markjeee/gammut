@@ -22,11 +22,17 @@ module Gammut
     File.join(root_path, GAMMU_CONFIG_PATH)
   end
 
+  def self.config_path
+    File.join(root_path, GAMMUT_CONFIG_PATH)
+  end
+
   def self.config
     if defined?(@config)
       @config
+    elsif File.exists?(config_path)
+      @config = YAML.load_file(config_path)
     else
-      @config = YAML.load_file(File.join(root_path, GAMMUT_CONFIG_PATH))
+      @config = nil
     end
   end
 
@@ -39,7 +45,7 @@ module Gammut
     if defined?(@devices)
       @devices
     else
-      @devices = Gammut::Registry.find_devices(config, registry_path)
+      @devices = Gammut::Registry.find_devices(config)
     end
   end
 
@@ -66,23 +72,29 @@ module Gammut
     l
   end
 
-  def self.update_usb_logger(root_path = nil)
-    l = Logger.new(File.join(root_path || ROOT_PATH, UPDATE_USB_LOG))
-    l.level = UPDATE_USB_LOG_LEVEL
-    l
-  end
-
   def self.probe_ttyUSB(devname)
     # sleep for a bit while, to let the USB device to properly initialize
     sleep(8)
 
     capture_and_log_errors do
+      config = Gammut.config
+
       logger.info { "Probing #{devname} with `gammu identify`..." }
 
       identify_data = Gammut::Gammu.gammu_identify(devname)
       unless identify_data.nil?
         yml_file_path = Gammut::Registry.register_devname(devname, identify_data)
         logger.info "Written registry: #{yml_file_path}"
+
+        unless config.nil?
+          svc = Gammut::Registry.find_service_by_devname(devname, config)
+          unless svc.nil?
+            if svc.auto_start?
+              logger.info { "Auto-starting gammu-smsd #{svc.skey} for #{devname}" }
+              svc.start
+            end
+          end
+        end
       end
     end
   end
@@ -91,6 +103,18 @@ module Gammut
     sleep(0.5)
 
     capture_and_log_errors do
+      config = Gammut.config
+      unless config.nil?
+        svc = Gammut::Registry.find_service_by_devname(devname, config)
+        unless svc.nil?
+          pid = svc.status
+          unless pid.nil?
+            logger.info { "Stopping known running gammu-smsd for #{svc.skey} with pid #{pid}" }
+            svc.stop
+          end
+        end
+      end
+
       logger.info { "Removing from registry #{devname}" }
       Gammut::Registry.unregister_devname(devname)
     end

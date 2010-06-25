@@ -86,9 +86,9 @@ GSCF
       basen = File.basename(devname)
       tmp_config_path = File.join(Gammut.gammu_config_path, "#{basen}.config")
 
-      ccf = "#{CUSTOM_CONFIG_FILE}"
-      ccf.gsub!("%devname%", devname)
-      File.open(tmp_config_path, 'w') { |f| f.write(ccf) }
+      gcf = "#{GAMMU_CONFIG_FILE}"
+      gcf.gsub!("%devname%", devname)
+      File.open(tmp_config_path, 'w') { |f| f.write(gcf) }
 
       cmd = "#{GAMMU_BIN} -c #{tmp_config_path}"
       if GAMMU_BIN_LOG_ENABLE
@@ -225,7 +225,7 @@ GSCF
             loop do
               repl = stdo.gets
               unless repl.nil?
-                reply.push = repl = repl.strip
+                reply.push(repl = repl.strip)
                 logger.debug { "GOT: #{repl}" }
                 yield(repl) if block_given?
               end

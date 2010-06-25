@@ -12,7 +12,22 @@ module Gammut
       config = Gammut.config
       services = Gammut.services
       services.each do |s|
-        puts "#{s.oneline_info}"
+        if s.connected?
+          pid = s.status
+
+          puts "#{s.skey}: #{s.devname}\n"
+          puts "  IMEI: #{s.imei}\n"
+          puts "  IMSI: #{s.imsi}\n"
+          if pid.nil?
+            puts "  not running\n"
+          else
+            puts "  running with pid #{pid}\n"
+          end
+
+          puts "\n"
+        else
+          puts "#{s.oneline_info}"
+        end
       end
     end
 
