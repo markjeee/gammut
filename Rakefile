@@ -5,6 +5,7 @@ task :initialize_working_directory do
 
   FileUtils.mkpath(File.join(root_path, 'var'))
   FileUtils.mkpath(File.join(root_path, 'var/registry'))
+  FileUtils.mkpath(File.join(root_path, 'var/run'))
   FileUtils.mkpath(File.join(root_path, 'dev'))
   FileUtils.mkpath(File.join(root_path, 'log'))
   FileUtils.mkpath(File.join(root_path, 'tmp'))

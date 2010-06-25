@@ -7,20 +7,32 @@ module Gammut
       @sdata = sdata
     end
 
+    def connected?
+      !device.nil?
+    end
+
     # write configuration file. overwriting any
     def configure
+      devname = device.devname
+      gsco = { 'service_name' => @skey }
+
+      Gammut::Gammu.gammu_smsd_create_configuration(devname, gsco)
     end
 
     # start the service, if not started
     def start
+      configure
+      Gammut::Gammu.gammu_smsd_start(device.devname, @skey)
     end
 
     # stop the service if not available
     def stop
+      Gammut::Gammu.gammu_smsd_stop(device.devname, @skey)
     end
 
     # check if the service is running
     def status
+      Gammut::Gammu.gammu_smsd_status(device.devname, @skey)
     end
 
     def device

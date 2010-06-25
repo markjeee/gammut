@@ -8,6 +8,14 @@ module Gammut
       devices
     end
 
+    def self.find_service(service_name, config)
+      if config['services'].include?(service_name)
+        Gammut::Service.new(service_name, config['services'][service_name])
+      else
+        nil
+      end
+    end
+
     def self.find_services(config)
       svcs = [ ]
       config['services'].each do |sk, sd|

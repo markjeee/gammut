@@ -38,4 +38,6 @@ when 'stop'
   Gammut::Runner.stop(ARGV, opts)
 when 'status'
   Gammut::Runner.status(ARGV, opts)
+when 'configure'
+  Gammut::Runner.configure(ARGV, opts)
 end
