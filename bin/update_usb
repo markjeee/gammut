@@ -1,6 +1,10 @@
 #!/usr/bin/ruby
+#
+# You can change this shebang line to wherever your actual ruby
+# interpreter is. This script is called up from udev daemon, which
+# don't necessarily have a working PATH or environment. So the actual
+# path to the interpreter is needed.
 
-require 'logger'
 ROOT_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 require File.join(ROOT_PATH, 'config/env_defaults')
 
@@ -15,6 +19,7 @@ Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
 
 # just bail out if we smell something fishy!
 exit(0) if ENV['ACTION'].nil? || ENV['ACTION'].empty?
+
 l.debug { "#{ENV['SUBSYSTEM']} #{ENV['ACTION']} #{ENV['DEVPATH']}" }
 
 fork_proc = nil

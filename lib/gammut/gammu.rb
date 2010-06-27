@@ -1,5 +1,3 @@
-require 'open3'
-
 module Gammut
   module Gammu
     GAMMU_CONFIG_FILE = <<GCF
@@ -98,7 +96,7 @@ GSCF
       cmd += " identify"
 
       identify_data = { }
-      open_system(cmd) do |reply|
+      Gammut::Utils.open_system(cmd) do |reply|
         # split, and do a lot of whitespace and quotes cleaning
         ikey, ival = reply.split(/\s+\:\s+/, 2)
         unless ival.nil?
@@ -128,11 +126,11 @@ GSCF
       config_file_path = File.join(Gammut.root_path, "var/#{service_name}.gammu-smsd.config")
 
       cmd = "#{GAMMU_SMSD_BIN} -d -c #{config_file_path} -p #{pid_file}"
-      open_system(cmd)
+      Gammut::Utils.open_system(cmd)
 
       sleep(1)
       if File.exists?(pid_file)
-        pid = File.read(pid_file).strip
+        pid = Gammut::Utils.read_pid_file(pid_file)
         logger.info "gammu-smsd service_name = #{service_name} devname = #{devname} found running at #{pid}"
         pid
       else
@@ -145,13 +143,13 @@ GSCF
       logger = Gammut.logger
       pid_file = File.join(Gammut.root_path, "var/run/#{service_name}.gammu-smsd.pid")
 
-      pid = read_pid_file(pid_file)
+      pid = Gammut::Utils.read_pid_file(pid_file)
       unless pid.nil?
         tm = 10; step = 0.5
 
         logger.info "Sending 'TERM' to running gammu-smsd with pid #{pid} (#{tm} sec(s) tm)"
         Process.kill('TERM', pid)
-        until !process_running?(pid)
+        until !Gammut::Utils.process_running?(pid)
           sleep(step)
           (tm -= step) > 0 && next
 
@@ -175,13 +173,8 @@ GSCF
         pid = File.read(pid_file).strip.to_i
 
         if pid > 0
-          begin
-            pid = nil if Process.getpgid(pid) == -1
-          rescue Errno::ESRCH
+          unless Gammut::Utils.process_running?(pid)
             pid = nil
-          end
-
-          if pid.nil?
             logger.warn "Found an existing pid file with pid #{pid} but it looks orphaned. Deleting."
             File.delete(pid_file)
           end
@@ -194,57 +187,6 @@ GSCF
       else
         nil
       end
-    end
-
-    def self.process_running?(pid)
-      Process.getpgid(pid) != -1
-    rescue Errno::ESRCH
-      false
-    end
-
-    def self.read_pid_file(pid_file)
-      if File.exists?(pid_file)
-        File.read(pid_file).strip.to_i
-      else
-        nil
-      end
-    end
-
-    def self.open_system(cmd, &block)
-      logger = Gammut.logger
-      reply = [ ]
-
-      logger.debug "Exec #{cmd}"
-      stdn, stdo, stdr  = Open3.popen3(cmd)
-      unless stdo.nil?
-        # allow up to 90 secs. sometimes probing takes a while.
-        tm = 90
-
-        begin
-          Timeout::timeout(tm) do
-            loop do
-              repl = stdo.gets
-              unless repl.nil?
-                reply.push(repl = repl.strip)
-                logger.debug { "GOT: #{repl}" }
-                yield(repl) if block_given?
-              end
-
-              break if stdo.eof?
-            end
-          end
-        rescue Timeout::Error
-          logger.error { "Timeout! Unable to get response within #{tm} second(s)" }
-        ensure
-          stdo.close
-          stdn.close
-          stdr.close
-        end
-      else
-        logger.error { "Open-pipe cmd returned nil. Something is wrong" }
-      end
-
-      reply
     end
   end
 end
