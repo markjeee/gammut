@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+if File.symlink?(__FILE__)
+  fn = File.readlink(__FILE__)
+else
+  fn = __FILE__
+end
+
+ROOT_PATH = File.expand_path(File.join(File.dirname(fn), '..'))
+require File.join(ROOT_PATH, 'config/env_defaults')
+
+# Load environment constants
+if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
+  require File.join(ROOT_PATH, 'config/env')
+end
+
+require File.join(ROOT_PATH, 'lib/gammut')
+Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
+
+require 'optparse'
+require 'ostruct'
+
+opts = OpenStruct.new
+opts_parse = OptionParser.new do |o|
+  o.banner = "Gammut relay service utility\n" +
+    "  Usage: #{$0} command [options]\n" +
+    "  Commands: status start stop"
+
+  o.separator ""
+end
+opts_parse.parse!(ARGV)
+
+command = ARGV[0]
+case command
+when nil, ''
+when 'start'
+
+when 'stop'
+
+when 'status'
+
+end

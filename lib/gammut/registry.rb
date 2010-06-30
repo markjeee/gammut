@@ -84,6 +84,11 @@ module Gammut
         File.delete(yml_file_path) rescue nil
       end
 
+      gammu_config_path = File.join(Gammut.root_path, "var/#{basen}.config")
+      if File.exists?(gammu_config_path)
+        File.delete(gammu_config_path)
+      end
+
       yml_file_path
     end
 

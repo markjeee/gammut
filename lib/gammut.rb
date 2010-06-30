@@ -9,6 +9,8 @@ module Gammut
   autoload :Service, File.join(File.dirname(__FILE__), 'gammut/service')
   autoload :Device, File.join(File.dirname(__FILE__), 'gammut/device')
   autoload :Utils, File.join(File.dirname(__FILE__), 'gammut/utils')
+  autoload :Relay, File.join(File.dirname(__FILE__), 'gammut/relay')
+  autoload :Campout, File.join(File.dirname(__FILE__), 'gammut/campout')
 
   def self.root_path; @root_path; end
   def self.root_path=(rp); @root_path = rp; end

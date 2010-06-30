@@ -158,6 +158,10 @@ GSCF
           sleep(step)
         end
 
+        if File.exists?(pid_file)
+          File.delete(pid_file)
+        end
+
         pid
       else
         nil
