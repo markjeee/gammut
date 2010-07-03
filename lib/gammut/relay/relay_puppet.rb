@@ -10,12 +10,19 @@ module Gammut::Relay
       Gammut.init(ROOT_PATH, Gammut.gammut_logger)
 
       db_config = Gammut.database_config
-      master_logger.debug { "Gammut db config: #{db_config.inspect}" }
       db = Sequel.connect(db_config)
+      master_logger.debug { "Gammut db config: #{db.inspect}" }
+
+      w.data[:db] = db
     end
 
     def perform_work(w)
 
+    end
+
+    def after_work(w, ret = nil)
+      master_logger.debug { "Closing db connection" }
+      w.data[:db].disconnect
     end
   end
 end
