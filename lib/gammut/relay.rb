@@ -11,13 +11,6 @@ module Gammut
   module Relay
     autoload :WorkerPuppet, File.join(File.dirname(__FILE__), 'relay/worker_puppet')
     autoload :RelayPuppet, File.join(File.dirname(__FILE__), 'relay/relay_puppet')
-
-    def self.worker_puppet
-      Gammut::Relay::WorkerPuppet
-    end
-
-    def self.relay_puppet
-      Gammut::Relay::RelayPuppet
-    end
+    autoload :Transport, File.join(File.dirname(__FILE__), 'relay/relay_puppet')
   end
 end

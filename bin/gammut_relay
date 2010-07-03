@@ -24,12 +24,12 @@ Sequel.single_threaded = true
 # gem 'puppet_master'
 # require 'palmade/puppet_master'
 require File.join(ROOT_PATH, '../puppet_master/lib/palmade/puppet_master')
+
 Palmade::PuppetMaster.runner!(ARGV) do |m, configurator, config, controller|
-  # i'm just doubling the timeout here, since we're dealing with slow connections to twitter
+  # i'm just doubling the timeout here, since we're dealing with slow
+  # connections to web services.
   # by default, up to 3 minutes of slow response
   m.timeout = m.timeout * 3
-
-  #m.use_service :queue
   m.use_service :redis
 
   if config[:servers].nil?

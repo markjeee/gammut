@@ -10,10 +10,13 @@ module Gammut
   autoload :Device, File.join(File.dirname(__FILE__), 'gammut/device')
   autoload :Utils, File.join(File.dirname(__FILE__), 'gammut/utils')
 
-  # these two requires additional gems, such as puppet_master, camping
-  # and camping_ext
+  # these two requires additional gems, such as puppet_master, camping,
+  # camping_ext, and sequel
   autoload :Relay, File.join(File.dirname(__FILE__), 'gammut/relay')
   autoload :Campout, File.join(File.dirname(__FILE__), 'gammut/campout')
+
+  # this requires the sequel gem loaded
+  autoload :SmsUtil, File.join(File.dirname(__FILE__), 'gammut/sms_util')
 
   def self.root_path; @root_path; end
   def self.root_path=(rp); @root_path = rp; end
@@ -47,6 +50,20 @@ module Gammut
       config['database']
     else
       { }
+    end
+  end
+
+  def self.database
+    if defined?(::Sequel)
+      if defined?(@database)
+        @database
+      else
+        @database = Sequel.connect(Gammut.database_config)
+        @database.loggers << gammut_logger
+        @database
+      end
+    else
+      raise "sequel gem is not loaded"
     end
   end
 
