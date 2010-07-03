@@ -12,13 +12,43 @@ module Gammut
     end
 
     def auto_start?
-      true
+      if @sdata.include?('auto_start') && @sdata['auto_start']
+        true
+      else
+        false
+      end
     end
 
     # write configuration file. overwriting any
     def configure
       devname = device.devname
       gsco = { 'service_name' => @skey }
+
+      # database:
+      #   adapter: mysql
+      #   user: root
+      #   password:
+      #   database: smsd
+      #   host: 127.0.0.1
+      #   port: 3306
+      #   encoding: utf8
+      #
+      # convert to the following below:
+      #   db_user db_password db_host_with_port db_database
+
+      db_config = Gammut.database_config || { }
+      if @sdata.include?('database')
+        db_config = db_config.merge(@sdata['database'])
+      end
+
+      gsco['db_user'] = db_config['user'] if db_config.include?('user')
+      gsco['db_password'] = db_config['password'] if db_config.include?('password')
+      gsco['db_database'] = db_config['database'] if db_config.include?('database')
+      if db_config.include?('host')
+        host_with_port = "#{db_config['host']}"
+        host_with_port += ":#{db_config['port']}" if db_config.include?('port')
+        gsco['db_host_with_port'] = host_with_port
+      end
 
       Gammut::Gammu.gammu_smsd_create_configuration(devname, gsco)
     end

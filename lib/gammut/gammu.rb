@@ -71,7 +71,7 @@ GSCF
 
       gscf = "#{GAMMU_SMSD_CONFIG_FILE}"
       copts.each do |ok, ov|
-        gscf.gsub!("%#{ok}%", ov)
+        gscf.gsub!("%#{ok}%", ov || '')
       end
       File.open(config_file_path, 'w') { |f| f.write(gscf) }
 

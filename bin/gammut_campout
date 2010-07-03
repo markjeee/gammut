@@ -13,6 +13,12 @@ require File.join(ROOT_PATH, 'config/env_defaults')
 if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
   require File.join(ROOT_PATH, 'config/env')
 end
-
 require File.join(ROOT_PATH, 'lib/gammut')
-Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
+
+# if there's a gem, use this
+# gem 'puppet_master'
+# require 'palmade/puppet_master'
+require File.join(ROOT_PATH, '../puppet_master/lib/palmade/puppet_master')
+Palmade::PuppetMaster.runner!(ARGV) do |m, configurator, config, controller|
+
+end

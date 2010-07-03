@@ -13,30 +13,30 @@ require File.join(ROOT_PATH, 'config/env_defaults')
 if File.exists?(File.join(ROOT_PATH, 'config/env.rb'))
   require File.join(ROOT_PATH, 'config/env')
 end
-
 require File.join(ROOT_PATH, 'lib/gammut')
-Gammut.init(ROOT_PATH, l = Gammut.gammut_logger(ROOT_PATH))
 
-require 'optparse'
-require 'ostruct'
+require 'rubygems'
+gem 'sequel', '> 3.13.0'
+require 'sequel_core'
+Sequel.single_threaded = true
 
-opts = OpenStruct.new
-opts_parse = OptionParser.new do |o|
-  o.banner = "Gammut relay service utility\n" +
-    "  Usage: #{$0} command [options]\n" +
-    "  Commands: status start stop"
+# if there's a gem, use this
+# gem 'puppet_master'
+# require 'palmade/puppet_master'
+require File.join(ROOT_PATH, '../puppet_master/lib/palmade/puppet_master')
+Palmade::PuppetMaster.runner!(ARGV) do |m, configurator, config, controller|
+  # i'm just doubling the timeout here, since we're dealing with slow connections to twitter
+  # by default, up to 3 minutes of slow response
+  m.timeout = m.timeout * 3
 
-  o.separator ""
-end
-opts_parse.parse!(ARGV)
+  #m.use_service :queue
+  m.use_service :redis
 
-command = ARGV[0]
-case command
-when nil, ''
-when 'start'
+  if config[:servers].nil?
+    config[:servers] = 3
+  end
 
-when 'stop'
-
-when 'status'
-
+  fam = m.single_family!
+  fam[:relay] = Gammut::Relay::RelayPuppet.new
+  fam[nil] = Gammut::Relay::WorkerPuppet.new(:count => config[:servers])
 end

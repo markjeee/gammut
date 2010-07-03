@@ -8,17 +8,16 @@ module Gammut
   # This is a relay service that fetches incoming SMS from smsd db,
   # and relay it to a gammut_campout service via HTTP service. It
   # works both for incoming and outgoing messages.
-  class Relay
-    def initialize
+  module Relay
+    autoload :WorkerPuppet, File.join(File.dirname(__FILE__), 'relay/worker_puppet')
+    autoload :RelayPuppet, File.join(File.dirname(__FILE__), 'relay/relay_puppet')
+
+    def self.worker_puppet
+      Gammut::Relay::WorkerPuppet
     end
 
-    def start
-    end
-
-    def stop
-    end
-
-    def status
+    def self.relay_puppet
+      Gammut::Relay::RelayPuppet
     end
   end
 end

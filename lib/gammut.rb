@@ -9,6 +9,9 @@ module Gammut
   autoload :Service, File.join(File.dirname(__FILE__), 'gammut/service')
   autoload :Device, File.join(File.dirname(__FILE__), 'gammut/device')
   autoload :Utils, File.join(File.dirname(__FILE__), 'gammut/utils')
+
+  # these two requires additional gems, such as puppet_master, camping
+  # and camping_ext
   autoload :Relay, File.join(File.dirname(__FILE__), 'gammut/relay')
   autoload :Campout, File.join(File.dirname(__FILE__), 'gammut/campout')
 
@@ -36,6 +39,14 @@ module Gammut
       @config = YAML.load_file(config_path)
     else
       @config = nil
+    end
+  end
+
+  def self.database_config
+    if config.include?('database')
+      config['database']
+    else
+      { }
     end
   end
 
