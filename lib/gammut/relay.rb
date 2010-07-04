@@ -37,9 +37,11 @@ module Gammut
       end
     end
 
+    def self.root_path; Gammut.root_path; end
+    def self.logger; Gammut.logger; end
+    def self.database; Gammut.database; end
     def self.services; @services; end
     def self.recipients; @recipients; end
-    def self.database; Gammut.database; end
 
     # check at smsd.inbox, returns Gammut::SmsUtil::Message
     def self.find_new_messages(recipients)

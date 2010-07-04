@@ -14,11 +14,10 @@ module Gammut::Relay
     def before_work(w, ret = nil)
       super(w, ret)
       master = w.master
+      rcache = master.services[:redis].client
 
       Gammut::Relay.init(ROOT_PATH, l = Gammut::Relay.relay_logger)
-
-      w.data[:recipients] = recipients = Gammut::Relay.recipients
-      rcache = master.services[:redis].client
+      recipients = Gammut::Relay.recipients
       w.data[:transport] = Gammut::Relay::Transport.new(rcache)
 
       l.debug { "Connected to redis: #{rcache.inspect}" }
@@ -31,7 +30,8 @@ module Gammut::Relay
     end
 
     def perform_work(w)
-      recipients = w.data[:recipients]
+      l = Gammut::Relay.logger
+      recipients = Gammut::Relay.recipients
       transport = w.data[:transport]
 
       # (1) check for overdue items
