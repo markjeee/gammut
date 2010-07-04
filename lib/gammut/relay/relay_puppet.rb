@@ -12,24 +12,49 @@ module Gammut::Relay
     end
 
     def before_work(w, ret = nil)
-      super(w)
+      super(w, ret)
+      master = w.master
 
-      Gammut.init(ROOT_PATH, Gammut.gammut_logger)
+      Gammut::Relay.init(ROOT_PATH, Gammut::Relay.relay_logger)
 
-      w.data[:db] = db = Sequel.connect(Gammut.database_config)
-      master_logger.debug { "Gammut db config: #{db.inspect}" }
+      w.data[:recipients] = recipients = Gammut::Relay.recipients
+      rcache = master.services[:redis].client
+      w.data[:transport] = Gammut::Relay::Transport.new(rcache)
+
+      master_logger.debug { "Working with recipients: #{recipients.inspect}" }
+
+      # (1) re-set worked_at fields
+      Gammut::Relay::Message.reset_all_messages(recipients)
 
       ret
     end
 
     def perform_work(w)
+      recipients = w.data[:recipients]
+      transport = w.data[:transport]
 
+      # (1) check for overdue items
+      Gammut::Relay::Message.reset_overdue_messages(recipients)
+
+      # (2) check smsd.inbox for new messages
+      Gammut::Relay.find_new_messages(recipients) do |sms|
+        Gammut::Relay::Message.enqueue_message(sms)
+        sms.processed!
+      end
+
+      # (3) Find pending messages for working
+      msgs = Gammut::Relay::Message.find_pending_messages(recipients)
+      unless msgs.nil? || msgs.empty?
+        transport.enqueue_for_sending(msgs)
+      else
+        # else, no messages for sending
+      end
     end
 
     def after_work(w, ret = nil)
-      master_logger.debug { "Closing db connection" }
-      w.data[:db].disconnect
-      w.data.delete(:db)
+      super(w, ret)
+
+      w.data[:transport].shutdown!
     end
   end
 end

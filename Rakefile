@@ -39,3 +39,11 @@ task :initialize => [ :initialize_working_directory ] do
 
   puts "Alrighty, initialized #{root_path}"
 end
+
+desc "Re-initialize db schema"
+task :dbcreate do
+  `echo 'drop database smsd;' | mysql`
+  `echo 'create database smsd;' | mysql`
+  `cat lib/gammu-smsd.mysql.sql | mysql smsd`
+  `cat lib/gammu-smsd-extensions.mysql.sql | mysql smsd`
+end

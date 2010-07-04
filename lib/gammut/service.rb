@@ -19,6 +19,14 @@ module Gammut
       end
     end
 
+    def relay?
+      @sdata.include?('relay') && !@sdata['relay'].nil? && !@sdata['relay'].empty?
+    end
+
+    def relay
+      @sdata['relay']
+    end
+
     # write configuration file. overwriting any
     def configure
       devname = device.devname

@@ -23,3 +23,12 @@ globe:
 * Add bin/scan_usb, for making manual scans of existing USB devices
 * Add bin/list_registry, for listing useful information in the registry
 * Add Rakefile and necessary init and configure tasks
+
+
+** NOTES **
+
+-- Additional fields
+[inbox]
+processed_at
+worked_at
+try_count

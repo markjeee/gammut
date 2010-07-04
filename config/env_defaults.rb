@@ -13,3 +13,6 @@ GAMMUT_CONFIG_PATH = 'config/gammut.yml'
 GAMMUT_LOG = 'log/gammut.log'
 GAMMUT_LOG_LEVEL = Logger::INFO
 GAMMUT_REGISTRY_PATH = 'var/registry'
+
+GAMMUT_RELAY_LOG = 'log/gammut_relay.log'
+GAMMUT_RELAY_LOG_LEVEL = Logger::INFO
