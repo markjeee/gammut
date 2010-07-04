@@ -1,6 +1,6 @@
 module Gammut::Relay
   # corresponds to a record in inbox_relay table
-  class Message
+  class InboxMessage
     attr_reader :recipient_id
 
     # check at smsd.inbox_relay

@@ -16,6 +16,7 @@ module Gammut
   autoload :Campout, File.join(File.dirname(__FILE__), 'gammut/campout')
 
   # this requires the sequel gem loaded
+  autoload :Sms, File.join(File.dirname(__FILE__), 'gammut/sms')
   autoload :SmsUtil, File.join(File.dirname(__FILE__), 'gammut/sms_util')
 
   def self.root_path; @root_path; end

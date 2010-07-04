@@ -214,8 +214,6 @@ module Gammut
     end
 
     def self.messages(conn, recipients = nil, limit = 100, processed = false, parse_multipart = true, complete = true)
-
-
       # if processing multi-parts, only get ID, UDH, SenderNumber, Processed
       if complete
         ds = conn[:inbox].select_all
