@@ -15,13 +15,14 @@ module Gammut::Relay
       super(w, ret)
       master = w.master
 
-      Gammut::Relay.init(ROOT_PATH, Gammut::Relay.relay_logger)
+      Gammut::Relay.init(ROOT_PATH, l = Gammut::Relay.relay_logger)
 
       w.data[:recipients] = recipients = Gammut::Relay.recipients
       rcache = master.services[:redis].client
       w.data[:transport] = Gammut::Relay::Transport.new(rcache)
 
-      master_logger.debug { "Working with recipients: #{recipients.inspect}" }
+      l.debug { "Connected to redis: #{rcache.inspect}" }
+      l.debug { "Working with recipients: #{recipients.inspect}" }
 
       # (1) re-set worked_at fields
       Gammut::Relay::Message.reset_all_messages(recipients)
