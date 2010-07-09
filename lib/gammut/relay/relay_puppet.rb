@@ -21,7 +21,11 @@ module Gammut::Relay
       w.data[:transport] = Gammut::Relay::Transport.new(rcache)
 
       l.debug { "Connected to redis: #{rcache.inspect}" }
-      l.debug { "Working with recipients: #{recipients.inspect}" }
+      unless recipients.empty?
+        l.debug { "Working with recipients: #{recipients.inspect}" }
+      else
+        l.warn { "Working with an empty recipients (meaning? nothing to do)" }
+      end
 
       # (1) re-set worked_at fields
       Gammut::Relay::InboxMessage.reset_all_messages(recipients)
@@ -30,30 +34,48 @@ module Gammut::Relay
     end
 
     def perform_work(w)
+      db = Gammut.database
       l = Gammut.logger
       recipients = Gammut::Relay.recipients
       transport = w.data[:transport]
 
-      # (1) check for overdue items
-      Gammut::Relay::InboxMessage.reset_overdue_messages(recipients)
+      processed = 0
+      unless recipients.empty?
+        # (1) check for overdue items
+        db.transaction do
+          overdue_ims = Gammut::Relay::InboxMessage.reset_overdue_messages(recipients)
+          unless overdue_ims.empty?
+            l.warn { "Found #{overdue_ims.size} overdue messages" }
+          end
+        end
 
-      # (2) check smsd.inbox for new messages
-      Gammut::Sms.find_new_messages(recipients.to_a) do |sms|
-        Gammut::Relay::InboxMessage.enqueue_message(sms)
-        sms.processed!
+        # (2) check smsd.inbox for new messages
+        db.transaction do
+          smses = Gammut::Sms.find_new_messages(recipients.to_a)
+          unless smses.nil? || smses.empty?
+            smses.each do |sms|
+              Gammut::Relay::InboxMessage.enqueue_message(sms)
+              sms.processed!
+            end
+            processed += smses.count
+          end
+        end
+
+        db.transaction do
+          # (3) Find pending messages for working
+          msgs = Gammut::Relay::InboxMessage.find_pending_messages(recipients)
+          unless msgs.nil? || msgs.empty?
+            msgs.each { |m| transport.relay_send(m) }
+            processed += msgs.count
+          end
+        end
+
+        # (4) Check sent smses, and mark relay
+
+        # (5) Enqueue to retrieve pending messages from relay endpoint
       end
 
-      # (3) Find pending messages for working
-      msgs = Gammut::Relay::InboxMessage.find_pending_messages(recipients)
-      unless msgs.nil? || msgs.empty?
-        transport.enqueue_for_sending(msgs)
-      else
-        # else, no messages for sending
-      end
-
-      # (4) Check sent smses, and mark relay
-
-      # (5) Enqueue to retrieve pending messages from relay endpoint
+      transport.idle if processed == 0
     end
 
     def after_work(w, ret = nil)

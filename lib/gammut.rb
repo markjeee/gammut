@@ -60,7 +60,7 @@ module Gammut
         @database
       else
         @database = Sequel.connect(Gammut.database_config)
-        @database.loggers << gammut_logger
+#        @database.loggers << logger
         @database
       end
     else

@@ -16,9 +16,12 @@ end
 require File.join(ROOT_PATH, 'lib/gammut')
 
 require 'rubygems'
-gem 'sequel', '> 3.13.0'
+gem 'sequel', '>= 3.13.0'
 require 'sequel_core'
 Sequel.single_threaded = true
+
+gem 'yajl-ruby', '>= 0.7.6'
+require 'yajl'
 
 # if there's a gem, use this
 # gem 'puppet_master'

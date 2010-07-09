@@ -15,11 +15,12 @@ CREATE TABLE `smsd`.`inbox_relay` (
   `ID` INTEGER  NOT NULL,
   `sender_number` VARCHAR(20) NOT NULL,
   `message` TEXT NOT NULL,
-  `recieved_at` DATETIME NOT NULL,
+  `received_at` DATETIME NOT NULL,
   `recipient_id` VARCHAR(64) DEFAULT NULL,
   `network` VARCHAR(64)  DEFAULT NULL,
   `sent_at` DATETIME  DEFAULT NULL,
   `worked_at` DATETIME  DEFAULT NULL,
+  `rt_at` DATETIME DEFAULT NULL,
   `try_count` INTEGER  NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   INDEX `recipient_id`(`recipient_id`),
@@ -28,4 +29,3 @@ CREATE TABLE `smsd`.`inbox_relay` (
   INDEX `try_count`(`try_count`)
 )
 ENGINE = InnoDB;
-

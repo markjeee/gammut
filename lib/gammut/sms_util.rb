@@ -19,8 +19,9 @@ module Gammut
       attr_accessor :sender_number
       attr_accessor :orig_message
       attr_accessor :recipient
-      attr_accessor :udh_text
+      attr_accessor :received_at
 
+      attr_accessor :udh_text
       attr_reader :udh
 
       # these two are only set when this is part of a multipart
@@ -58,6 +59,8 @@ module Gammut
             @message = @hash_data[:TextDecoded].lstrip.freeze
           end
 
+          @received_at = @hash_data[:ReceivingDateTime]
+
           @complete = true
         end
 
@@ -66,6 +69,10 @@ module Gammut
 
       def complete?
         @complete
+      end
+
+      def network
+        Gammut::SmsUtil.which_network(@sender_number)
       end
 
       def message
