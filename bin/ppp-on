@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+#
+
+device = ARGV[0]
+if device.nil? || device.empty?
+  puts "Please specify a device"
+  exit(-1)
+end
+
+provider = ARGV[1]
+if provider.nil? || provider.empty?
+  puts "Please specify a provider"
+  exit(-1)
+end
+
+cmd = "env MODEM=#{device} /usr/sbin/pppd #{device} debug lock 115200 modem crtscts" +
+       " usepeerdns noipdefault usehostname noauth" +
+       " linkname #{provider} ipparam #{provider}" +
+       " connect \"wvdial -c #{provider}\""
+
+pid = fork()
+unless pid.nil?
+  puts "#{pid}"
+else
+  Process.setsid
+
+  $stdin.reopen('/dev/null')
+  $stdin.sync
+
+  puts "Executing #{cmd}"
+  exec(cmd)
+end
